@@ -22,6 +22,8 @@ PyPipe is a lightweight and flexible data pipeline tool designed to combine the 
 	- ``pipeline <YOUR FILE NAME>``.
 - Kill processes with the command:
 	- ``bin/stop <YOUR FILE NAME>``.
+- Generate pipeline flow graph & data:
+	- ``bin/graph``.
  ## Example Usage:
  - Make sure ``kanto.xml`` & ``johto.xml`` exist in the ``pipelines/`` directory.
  - ``pipeline kanto`` (To start a scheduled pipeline).
