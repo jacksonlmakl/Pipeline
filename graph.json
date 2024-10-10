@@ -1,0 +1,156 @@
+{
+    "sinnoh_landing": {
+        "type": "python",
+        "inputs": [],
+        "outputs": [
+            "sinnoh_stg"
+        ],
+        "chains_to": null
+    },
+    "sinnoh_stg": {
+        "type": "python",
+        "inputs": [
+            "sinnoh_landing"
+        ],
+        "outputs": [
+            "sinnoh_raw"
+        ],
+        "chains_to": null
+    },
+    "sinnoh_raw": {
+        "type": "sql",
+        "inputs": [
+            "sinnoh_stg"
+        ],
+        "outputs": [
+            "sinnoh_conf"
+        ],
+        "chains_to": null
+    },
+    "sinnoh_conf": {
+        "type": "sql",
+        "inputs": [
+            "sinnoh_raw"
+        ],
+        "outputs": [
+            "sinnoh_core"
+        ],
+        "chains_to": null
+    },
+    "sinnoh_core": {
+        "type": "python",
+        "inputs": [
+            "sinnoh_conf"
+        ],
+        "outputs": [
+            "all_regions"
+        ],
+        "chains_to": "pipelines/sinnoh.xml"
+    },
+    "johto_landing": {
+        "type": "python",
+        "inputs": [],
+        "outputs": [
+            "johto_stg"
+        ],
+        "chains_to": null
+    },
+    "johto_stg": {
+        "type": "python",
+        "inputs": [
+            "johto_landing"
+        ],
+        "outputs": [
+            "johto_raw"
+        ],
+        "chains_to": null
+    },
+    "johto_raw": {
+        "type": "sql",
+        "inputs": [
+            "johto_stg"
+        ],
+        "outputs": [
+            "johto_conf"
+        ],
+        "chains_to": null
+    },
+    "johto_conf": {
+        "type": "sql",
+        "inputs": [
+            "johto_raw"
+        ],
+        "outputs": [
+            "johto_core"
+        ],
+        "chains_to": null
+    },
+    "johto_core": {
+        "type": "python",
+        "inputs": [
+            "johto_conf"
+        ],
+        "outputs": [
+            "all_regions"
+        ],
+        "chains_to": "pipelines/johto.xml"
+    },
+    "kanto_landing": {
+        "type": "python",
+        "inputs": [],
+        "outputs": [
+            "kanto_stg"
+        ],
+        "chains_to": null
+    },
+    "kanto_stg": {
+        "type": "python",
+        "inputs": [
+            "kanto_landing"
+        ],
+        "outputs": [
+            "kanto_raw"
+        ],
+        "chains_to": null
+    },
+    "kanto_raw": {
+        "type": "sql",
+        "inputs": [
+            "kanto_stg"
+        ],
+        "outputs": [
+            "kanto_conf"
+        ],
+        "chains_to": null
+    },
+    "kanto_conf": {
+        "type": "sql",
+        "inputs": [
+            "kanto_raw"
+        ],
+        "outputs": [
+            "kanto_core"
+        ],
+        "chains_to": null
+    },
+    "kanto_core": {
+        "type": "python",
+        "inputs": [
+            "kanto_conf"
+        ],
+        "outputs": [
+            "all_regions"
+        ],
+        "chains_to": "pipelines/kanto.xml"
+    },
+    "all_regions": {
+        "type": "sql",
+        "inputs": [
+            "johto_core",
+            "sinnoh_core",
+            "kanto_core"
+        ],
+        "outputs": [],
+        "chains_to": null
+    }
+}
