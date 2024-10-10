@@ -26,10 +26,10 @@ class PrintLogger:
 class PipelineLogger:
     def __init__(self,fname):
         file_name=fname+'__'+datetime.datetime.now().__str__().replace("-","_").replace(" ","__").replace(":","_").split(".")[0]
-        print(f"Saving log to {file_name}.log")
+        print(f"Saving log to {fname}.log")
         # Configure logging to log to a file
         logging.basicConfig(
-            filename=f'{file_name}.log', 
+            filename=f'{fname}.log', 
             level=logging.INFO, 
             format='%(asctime)s - %(levelname)s - %(message)s'
         )
