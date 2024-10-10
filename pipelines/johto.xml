@@ -134,8 +134,8 @@ import requests
 import datetime
 from core import Pipeline
 def main(johto_core):
-    p=Pipeline('pipelines/johto.xml')
-    print(f'Pipeline Johto Started.....')
+    p=Pipeline('pipelines/sinnoh.xml')
+    print(f'Pipeline Sinnoh Started.....')
     p.run()
     return johto_core.head(1)
 
