@@ -108,7 +108,7 @@ The XML file contains several key elements:
 - **inputs**: Object id's of tables that are inputs to this processor.
 - **primary_key**: Column used to identify unique rows for incremental loads (Required for incremental materialization).
 - **schema_change**: Handle schema changes (e.g., `drop_and_recreate`,`error`).
-- 
+
 ## **Writing Python/SQL Code Inside XML**
 
 - The Python/SQL code should be placed within a `python` or `sql` component.

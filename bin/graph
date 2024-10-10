@@ -23,4 +23,4 @@ fi
 cd bin
 python graph.py
 cd -
-cat graph.json
+# cat graph.json
