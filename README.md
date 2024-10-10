@@ -112,14 +112,17 @@ The XML file contains several key elements:
 ## **Writing Python/SQL Code Inside XML**
 
 - The Python/SQL code should be placed within a `python` or `sql` component.
-  
 Example:
 ```xml
 # Your Python code goes here
 def main():
     return get_johto_pokemon()
 ```
-
+- To execute Python code that does not materialize a SQL table, you can create a python component with only the parameters id and handler.
+Example:
+```xml 
+<python id="my_component" handler="main">
+```
 ## **Final Remarks**
 
 - Ensure the XML is well-formed with matching tags and properly escaped content.
