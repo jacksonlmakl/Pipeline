@@ -113,7 +113,7 @@ The XML file contains several key elements:
 
 - The Python/SQL code should be placed within a `python` or `sql` component.
 Example:
-```xml
+```python
 # Your Python code goes here
 def main():
     return get_johto_pokemon()
