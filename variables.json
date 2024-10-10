@@ -1,7 +1,7 @@
 {
     "connection_1_database": "RAW",
-    "connection_1_username": "*****",
-    "connection_1_password": "*****",
+    "connection_1_username": "georgetown",
+    "connection_1_password": "georgetown123",
     "connection_1_host": "ls-e8ed76a5368bcf40d7d7a6e7de5bca06d7ceca3b.cx6iawau684h.us-east-1.rds.amazonaws.com",
     "connection_1_port": 5432
 }

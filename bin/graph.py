@@ -1,13 +1,17 @@
 import os
 import json
 import re
+import matplotlib.pyplot as plt
+import networkx as nx
 from jinja2 import Template
 
 # Custom XML parser function provided by you
 def xml(xml_string):
-    # Load your variables.json file
-    with open('variables.json') as f:
+    # Load variables.json from the root directory (one level up)
+    with open('../variables.json') as f:
         variables = json.load(f)
+    
+    # Render the XML string using Jinja templating
     template = Template(xml_string)
     xml_string = template.render(variables)
 
@@ -54,8 +58,8 @@ def parser(xml_file_path):
     # Output the result
     return elements_list
 
-# Function to create a graph traversal order and output as graph.json
-def create_pipeline_json(pipelines_folder='pipelines/'):
+# Function to create a graph traversal order and output as graph.json and graph.png
+def create_pipeline_json_and_graph(pipelines_folder='../pipelines/'):
     graph_data = {}
 
     # Iterate through all .xml files in the pipelines directory
@@ -99,10 +103,74 @@ def create_pipeline_json(pipelines_folder='pipelines/'):
                 graph_data[input_id]['outputs'].append(elem_id)
 
     # Write the graph data to a JSON file
-    with open('graph.json', 'w') as json_file:
+    with open('../graph.json', 'w') as json_file:
         json.dump(graph_data, json_file, indent=4)
 
     print("graph.json created successfully!")
 
-# Call the function to create and save the pipeline traversal order to graph.json
-create_pipeline_json()
+    # Now generate the graph image and save as graph.png
+    generate_pipeline_graph(graph_data, '../graph.png')
+    print("graph.png created successfully!")
+
+# Function to generate the pipeline graph and save it as a PNG
+def generate_pipeline_graph(data, output_filename):
+    """
+    Function to generate a pipeline graph from JSON data and save it as a .png file.
+    
+    Args:
+    data (dict): JSON data describing the pipeline with tasks and their connections.
+    output_filename (str): Name of the file where the graph will be saved.
+    
+    Returns:
+    None
+    """
+    # Create a directed graph
+    G = nx.DiGraph()
+
+    # Add nodes and edges based on the JSON data
+    for task, info in data.items():
+        G.add_node(task, type=info['type'])
+        for output in info['outputs']:
+            G.add_edge(task, output)
+
+    # Assign colors based on type (python or sql)
+    color_map = []
+    for node in G:
+        if G.nodes[node]['type'] == 'python':
+            color_map.append('blue')
+        else:
+            color_map.append('green')
+
+    # Use shell layout for consistent, structured node placement
+    # Automatically generate shells by grouping nodes based on depth in the graph
+    layers = {}
+    def get_depth(node, current_depth=0):
+        if node not in layers or current_depth > layers[node]:
+            layers[node] = current_depth
+        for neighbor in G.successors(node):
+            get_depth(neighbor, current_depth + 1)
+
+    # Initialize depths
+    for node in G:
+        if not list(G.predecessors(node)):  # Starting nodes (no inputs)
+            get_depth(node)
+
+    # Group nodes by depth
+    shell_layers = [[] for _ in range(max(layers.values()) + 1)]
+    for node, depth in layers.items():
+        shell_layers[depth].append(node)
+
+    pos = nx.shell_layout(G, nlist=shell_layers)  # Generate shell layout positions
+
+    # Draw the graph
+    plt.figure(figsize=(10, 8))
+    nx.draw(G, pos, with_labels=True, node_color=color_map, node_size=3000, font_size=10, font_color='white', arrows=True)
+    plt.title('Task Flow Graph (Generated)')
+    
+    # Save the graph as a .png file
+    plt.savefig(output_filename)
+    plt.close()
+
+# Call the function to create and save the pipeline traversal order to graph.json and graph.png
+create_pipeline_json_and_graph()
+

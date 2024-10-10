@@ -2,7 +2,7 @@
 
 <task id="task_2" schedule="*/1 * * * *"></task>
 
-<python id="t5" table="JOHTO_LANDING" schema="POKEMON" database="RAW" handler="main" connection="connection_1" materialization="truncate" inputs="" schema_change="drop_and_recreate" >
+<python id="johto_landing" table="JOHTO_LANDING" schema="POKEMON" database="RAW" handler="main" connection="connection_1" materialization="truncate" inputs="" schema_change="drop_and_recreate" >
 import requests
 import pandas as pd
 
@@ -85,7 +85,7 @@ def main():
 
 
 </python>
-<python id="t6" table="JOHTO_STG" schema="POKEMON" database="RAW" handler="main" connection="connection_1" materialization="truncate" inputs="t5" schema_change="drop_and_recreate" >
+<python id="johto_stg" table="JOHTO_STG" schema="POKEMON" database="RAW" handler="main" connection="connection_1" materialization="truncate" inputs="johto_landing" schema_change="drop_and_recreate" >
 
 import pandas as pd
 import requests
@@ -96,14 +96,14 @@ def main(t0):
 
 </python>
 
-<sql id="t7" table="JOHTO_RAW" schema="POKEMON" database="RAW" connection="connection_1" materialization="incremental" primary_key="name" inputs="t6" schema_change="drop_and_recreate">
+<sql id="johto_raw" table="JOHTO_RAW" schema="POKEMON" database="RAW" connection="connection_1" materialization="incremental" primary_key="name" inputs="johto_stg" schema_change="drop_and_recreate">
 SELECT 
 * 
 FROM "POKEMON"."JOHTO_STG"
 
 </sql>
 
-<sql id="t8" table="JOHTO_CONF" schema="POKEMON" database="RAW" connection="connection_1" materialization="truncate"  inputs="t7" schema_change="drop_and_recreate">
+<sql id="johto_conf" table="JOHTO_CONF" schema="POKEMON" database="RAW" connection="connection_1" materialization="truncate"  inputs="johto_raw" schema_change="drop_and_recreate">
 SELECT
 "name"::VARCHAR AS NAME,
 "height"::INTEGER AS HEIGHT,
@@ -120,7 +120,7 @@ FROM "POKEMON"."JOHTO_RAW"
 
 </sql>
 
-<sql id="t9" table="JOHTO_CORE" schema="POKEMON" database="RAW" connection="connection_1" materialization="incremental" primary_key="name"  inputs="t8" schema_change="drop_and_recreate">
+<sql id="johto_core" table="JOHTO_CORE" schema="POKEMON" database="RAW" connection="connection_1" materialization="incremental" primary_key="name"  inputs="johto_conf" schema_change="drop_and_recreate">
 
 SELECT 
 * 

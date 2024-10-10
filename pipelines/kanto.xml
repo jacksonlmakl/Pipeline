@@ -2,7 +2,7 @@
 
 <task id="task_1" schedule="*/1 * * * *"></task>
 
-<python id="t0" table="KANTO_LANDING" schema="POKEMON" database="RAW" handler="main" connection="connection_1" materialization="truncate" inputs="" schema_change="drop_and_recreate" >
+<python id="kanto_landing" table="KANTO_LANDING" schema="POKEMON" database="RAW" handler="main" connection="connection_1" materialization="truncate" inputs="" schema_change="drop_and_recreate" >
 import requests
 import pandas as pd
 
@@ -85,7 +85,7 @@ def main():
 
 
 </python>
-<python id="t1" table="KANTO_STG" schema="POKEMON" database="RAW" handler="main" connection="connection_1" materialization="truncate" inputs="t0" schema_change="drop_and_recreate" >
+<python id="kanto_stg" table="KANTO_STG" schema="POKEMON" database="RAW" handler="main" connection="connection_1" materialization="truncate" inputs="kanto_landing" schema_change="drop_and_recreate" >
 
 import pandas as pd
 import requests
@@ -96,14 +96,14 @@ def main(t0):
 
 </python>
 
-<sql id="t2" table="KANTO_RAW" schema="POKEMON" database="RAW" connection="connection_1" materialization="incremental" primary_key="name" inputs="t1" schema_change="drop_and_recreate">
+<sql id="kanto_raw" table="KANTO_RAW" schema="POKEMON" database="RAW" connection="connection_1" materialization="incremental" primary_key="name" inputs="kanto_stg" schema_change="drop_and_recreate">
 SELECT 
 * 
 FROM "POKEMON"."KANTO_STG"
 
 </sql>
 
-<sql id="t3" table="KANTO_CONF" schema="POKEMON" database="RAW" connection="connection_1" materialization="truncate"  inputs="t2" schema_change="drop_and_recreate">
+<sql id="kanto_conf" table="KANTO_CONF" schema="POKEMON" database="RAW" connection="connection_1" materialization="truncate"  inputs="kanto_raw" schema_change="drop_and_recreate">
 SELECT
 "name"::VARCHAR AS NAME,
 "height"::INTEGER AS HEIGHT,
@@ -120,24 +120,24 @@ FROM "POKEMON"."KANTO_RAW"
 
 </sql>
 
-<sql id="t4" table="KANTO_CORE" schema="POKEMON" database="RAW" connection="connection_1" materialization="incremental" primary_key="name"  inputs="t3" schema_change="drop_and_recreate">
+<sql id="kanto_core" table="KANTO_CORE" schema="POKEMON" database="RAW" connection="connection_1" materialization="incremental" primary_key="name"  inputs="kanto_conf" schema_change="drop_and_recreate">
 
 SELECT 
 * 
 FROM "POKEMON"."KANTO_CONF"
 
 </sql>
-<python id="p0" table="KANTO_TEMP" schema="POKEMON" database="RAW" handler="main" connection="connection_1"  inputs=""  materialization="temp" schema_change="drop_and_recreate" >
+<python id="johto_landing" table="KANTO_TEMP" schema="POKEMON" database="RAW" handler="main" connection="connection_1"  inputs="kanto_core"  materialization="temp" schema_change="drop_and_recreate" >
 
 import pandas as pd
 import requests
 import datetime
 from core import Pipeline
-def main():
+def main(t4):
     p=Pipeline('pipelines/johto.xml')
     print(f'Pipeline Johto Started.....')
     p.run()
-    return p.get_table('t5').get_dataframe()
+    return t4.head(1)
 
 </python>
 
