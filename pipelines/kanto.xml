@@ -127,17 +127,4 @@ SELECT
 FROM "POKEMON"."KANTO_CONF"
 
 </sql>
-<python id="johto_landing" table="KANTO_TEMP" schema="POKEMON" database="RAW" handler="main" connection="connection_1"  inputs="kanto_core"  materialization="temp" schema_change="drop_and_recreate" >
-
-import pandas as pd
-import requests
-import datetime
-from core import Pipeline
-def main(kanto_core):
-    p=Pipeline('pipelines/johto.xml')
-    print(f'Pipeline Johto Started.....')
-    p.run()
-    return kanto_core.head(1)
-
-</python>
 

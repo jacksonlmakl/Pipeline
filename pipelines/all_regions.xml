@@ -1,0 +1,50 @@
+<connection id="connection_1" host="{{ connection_1_host }}" port="{{ connection_1_port }}" username="{{ connection_1_username }}" database="{{ connection_1_database }}" password="{{ connection_1_password }}"></connection>
+
+<task id="build_pokemon" schedule="*/1 * * * *"></task>
+
+<python id="johto_core" table="TEMP" schema="POKEMON" database="RAW" handler="main" connection="connection_1"  inputs="johto_conf"  materialization="temp" schema_change="drop_and_recreate" >
+
+import pandas as pd
+import requests
+import datetime
+from core import Pipeline
+def main(johto_core):
+    p=Pipeline('pipelines/johto.xml')
+    print(f'Pipeline Johto Started.....')
+    p.run()
+    return johto_core.head(1)
+
+</python>
+<python id="sinnoh_core" table="TEMP_1" schema="POKEMON" database="RAW" handler="main" connection="connection_1"  inputs="sinnoh_conf"  materialization="temp" schema_change="drop_and_recreate" >
+
+import pandas as pd
+import requests
+import datetime
+from core import Pipeline
+def main(sinnoh_core):
+    p=Pipeline('pipelines/sinnoh.xml')
+    print(f'Pipeline Sinnoh Started.....')
+    p.run()
+    return sinnoh_core.head(1)
+
+</python>
+<python id="kanto_core" table="TEMP_2" schema="POKEMON" database="RAW" handler="main" connection="connection_1"  inputs="kanto_conf"  materialization="temp" schema_change="drop_and_recreate" >
+
+import pandas as pd
+import requests
+import datetime
+from core import Pipeline
+def main(kanto_core):
+    p=Pipeline('pipelines/kanto.xml')
+    print(f'Pipeline Kanto Started.....')
+    p.run()
+    return kanto_core.head(1)
+
+</python>
+<sql id="all_regions" table="ALL_REGIONS" schema="POKEMON" database="RAW" connection="connection_1" materialization="truncate"  inputs="johto_core,sinnoh_core,kanto_core" schema_change="drop_and_recreate">
+
+SELECT 
+* 
+FROM "POKEMON"."JOHTO_CONF"
+
+</sql>
