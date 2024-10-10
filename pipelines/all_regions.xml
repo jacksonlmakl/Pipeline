@@ -1,50 +1,58 @@
 <connection id="connection_1" host="{{ connection_1_host }}" port="{{ connection_1_port }}" username="{{ connection_1_username }}" database="{{ connection_1_database }}" password="{{ connection_1_password }}"></connection>
 
-<task id="build_pokemon" schedule="*/1 * * * *"></task>
+<task id="build_pokemon" schedule="*/5 * * * *"></task>
 
-<python id="johto_core" table="TEMP" schema="POKEMON" database="RAW" handler="main" connection="connection_1"  inputs="johto_conf"  materialization="temp" schema_change="drop_and_recreate" >
+<python id="johto_core" handler="main" inputs="johto_conf">
 
 import pandas as pd
 import requests
 import datetime
 from core import Pipeline
-def main(johto_core):
+def main():
     p=Pipeline('pipelines/johto.xml')
     print(f'Pipeline Johto Started.....')
     p.run()
-    return johto_core.head(1)
+    return 0
 
 </python>
-<python id="sinnoh_core" table="TEMP_1" schema="POKEMON" database="RAW" handler="main" connection="connection_1"  inputs="sinnoh_conf"  materialization="temp" schema_change="drop_and_recreate" >
+<python id="sinnoh_core"  handler="main" inputs="sinnoh_conf">
 
 import pandas as pd
 import requests
 import datetime
 from core import Pipeline
-def main(sinnoh_core):
+def main():
     p=Pipeline('pipelines/sinnoh.xml')
     print(f'Pipeline Sinnoh Started.....')
     p.run()
-    return sinnoh_core.head(1)
+    return 0
 
 </python>
-<python id="kanto_core" table="TEMP_2" schema="POKEMON" database="RAW" handler="main" connection="connection_1"  inputs="kanto_conf"  materialization="temp" schema_change="drop_and_recreate" >
+<python id="kanto_core" handler="main" inputs="kanto_conf">
 
 import pandas as pd
 import requests
 import datetime
 from core import Pipeline
-def main(kanto_core):
+def main():
     p=Pipeline('pipelines/kanto.xml')
     print(f'Pipeline Kanto Started.....')
     p.run()
-    return kanto_core.head(1)
+    return 0
 
 </python>
 <sql id="all_regions" table="ALL_REGIONS" schema="POKEMON" database="RAW" connection="connection_1" materialization="truncate"  inputs="johto_core,sinnoh_core,kanto_core" schema_change="drop_and_recreate">
 
 SELECT 
 * 
-FROM "POKEMON"."JOHTO_CONF"
+FROM "POKEMON"."JOHTO_CORE"
+UNION ALL
+SELECT 
+* 
+FROM "POKEMON"."JOHTO_CORE"
+UNION ALL 
+SELECT 
+* 
+FROM "POKEMON"."JOHTO_CORE"
 
 </sql>

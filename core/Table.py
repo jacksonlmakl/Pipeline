@@ -63,19 +63,25 @@ class Table:
         self.connection.close()
         return df
     def build(self):
-        
-        df=self.get_dataframe()
+        if self.materialization != "" and self.materialization != None and self.type!='python':
+            df=self.get_dataframe()
         input_tables=[i for i in self.pipeline.tables if i.id in self.inputs]
-        dne_inputs=[i.id for i in input_tables if type(i.get_dataframe()) == type(None)]
+        try:
+            dne_inputs=[i.id for i in input_tables if type(i.get_dataframe()) == type(None)]
+        except:
+            input_tables=[]
+            dne_inputs=[]
         if len(dne_inputs)>0:
-            raise Exception(f"The following inputs do not exist: {dne_inputs}")
-            
-        self.connection.Session()
+            input_tables=[i for i in input_tables if i.id not in dne_inputs]
+            if self.materialization != "" and self.materialization != None:
+                raise Exception(f"The following inputs do not exist: {dne_inputs}")
+        if self.materialization != "" and self.materialization != None and self.type!='python':
+            self.connection.Session()
         if self.type=='python':
-            # formatted_code=
             input_str = '\n'.join([f"""{i.id} = [i.get_dataframe() for i in p.tables if i.id == '{i.id}'][0]""" for i in input_tables])
-            formatted_code = f"""from core import Pipeline\n\n{self.code}\n\np=Pipeline('{self.pipeline.file_name}')\n\n{input_str}\n\n{self.id} = {self.handler}({','.join([i.id for i in input_tables])})\n\ncurr_table=[i for i in p.tables if i.id=='{self.id}'][0]\n """ +f"""\n\n\n[i.connection for i in p.tables if i.id == '{self.id}'][0].Session()\n\ncurr_table.connection.df_to_table({self.id}, curr_table.table, curr_table.database, curr_table.schema, curr_table.materialization, schema_change_behavior=curr_table.schema_change, primary_key=curr_table.primary_key)"""
-            # print(formatted_code)
+            formatted_code = f"""from core import Pipeline\n\n{self.code}\n\np=Pipeline('{self.pipeline.file_name}')\n\n{input_str}\n\n{self.id} = {self.handler}({','.join([i.id for i in input_tables])})"""
+            if self.materialization != "" and self.materialization != None:
+                formatted_code = formatted_code+f"""\n\ncurr_table=[i for i in p.tables if i.id=='{self.id}'][0]\n """ +f"""\n\n\n[i.connection for i in p.tables if i.id == '{self.id}'][0].Session()\n\ncurr_table.connection.df_to_table({self.id}, curr_table.table, curr_table.database, curr_table.schema, curr_table.materialization, schema_change_behavior=curr_table.schema_change, primary_key=curr_table.primary_key)"""
             r=run_python_code(formatted_code, f"compute__{self.id}.py")
             print(r)
             return r
