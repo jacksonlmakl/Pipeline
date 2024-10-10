@@ -2,5 +2,5 @@
 source env/bin/activate
 cd bin
 python graph.py
-cat graph.json
 cd -
+cat graph.json
