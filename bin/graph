@@ -1,5 +1,25 @@
 #!/bin/bash
-source env/bin/activate
+# Check if the virtual environment "env" exists
+if [ ! -d "env" ]; then
+    echo "Creating virtual environment 'env'..."
+    python3 -m venv env
+    
+    # Activate the virtual environment
+    source env/bin/activate
+
+    # Install dependencies from requirements.txt if it exists
+    if [ -f "requirements.txt" ]; then
+        echo "Installing dependencies from requirements.txt..."
+        pip install -r requirements.txt
+    else
+        echo "No requirements.txt found, skipping dependency installation."
+    fi
+else
+    echo "Virtual environment 'env' already exists."
+    
+    # Activate the virtual environment
+    source env/bin/activate
+fi
 cd bin
 python graph.py
 cd -
