@@ -5,3 +5,4 @@ json5
 apscheduler
 pyaml
 jinja2
+networkx
