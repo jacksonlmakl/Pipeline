@@ -137,9 +137,9 @@ def generate_pipeline_graph(data, output_filename):
     color_map = []
     for node in G:
         if G.nodes[node]['type'] == 'python':
-            color_map.append('blue')
+            color_map.append('#93c9a2')
         else:
-            color_map.append('green')
+            color_map.append('#5177b0')
 
     # Use shell layout for consistent, structured node placement
     # Automatically generate shells by grouping nodes based on depth in the graph
@@ -163,8 +163,8 @@ def generate_pipeline_graph(data, output_filename):
     pos = nx.shell_layout(G, nlist=shell_layers)  # Generate shell layout positions
 
     # Draw the graph
-    plt.figure(figsize=(10, 8))
-    nx.draw(G, pos, with_labels=True, node_color=color_map, node_size=3000, font_size=10, font_color='white', arrows=True)
+    plt.figure(figsize=(1.4*len(data), 1.2*len(data) ))
+    nx.draw(G, pos, arrowsize=20, with_labels=True, node_color=color_map, node_size=7000, font_weight='bold', font_size=10, font_color='white', arrows=True,node_shape='o')
     plt.title('Task Flow Graph (Generated)')
     
     # Save the graph as a .png file
