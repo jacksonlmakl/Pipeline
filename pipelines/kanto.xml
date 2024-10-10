@@ -133,11 +133,11 @@ import pandas as pd
 import requests
 import datetime
 from core import Pipeline
-def main(t4):
+def main(kanto_core):
     p=Pipeline('pipelines/johto.xml')
     print(f'Pipeline Johto Started.....')
     p.run()
-    return t4.head(1)
+    return kanto_core.head(1)
 
 </python>
 
