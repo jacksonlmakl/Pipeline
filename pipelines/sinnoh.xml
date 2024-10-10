@@ -1,0 +1,131 @@
+<connection id="connection_1" host="{{ connection_1_host }}" port="{{ connection_1_port }}" username="{{ connection_1_username }}" database="{{ connection_1_database }}" password="{{ connection_1_password }}"></connection>
+
+<task id="task_2" schedule="*/1 * * * *"></task>
+
+<python id="sinnoh_landing" table="SINNOH_LANDING" schema="POKEMON" database="RAW" handler="main" connection="connection_1" materialization="truncate" inputs="" schema_change="drop_and_recreate" >
+import requests
+import pandas as pd
+
+def get_sinnoh_pokemon():
+    """
+    Fetches all Pokémon from the Kanto region using the PokeAPI.
+    
+    Returns:
+        DataFrame: A Pandas DataFrame containing name, height, weight, abilities, and base stats of all Kanto Pokémon.
+    """
+    # Kanto region ID is 2 (according to PokeAPI)
+    sinnoh_pokedex_url = "https://pokeapi.co/api/v2/pokedex/2/"
+    
+    # Fetch the Kanto region Pokémon list
+    response = requests.get(sinnoh_pokedex_url)
+    
+    if response.status_code != 200:
+        print(f"Error: Could not fetch Kanto Pokedex. Status code {response.status_code}")
+        return None
+    
+    sinnoh_pokemon = response.json()['pokemon_entries']
+    
+    # List to hold Pokémon data
+    pokemon_data_list = []
+    
+    # Iterate through each Pokémon in the Kanto region
+    for entry in sinnoh_pokemon:
+        pokemon_name = entry['pokemon_species']['name']
+        pokemon_data = get_pokemon_data(pokemon_name)
+        
+        if pokemon_data:
+            pokemon_data_list.append(pokemon_data)
+    
+    # Create a DataFrame from the list of Pokémon data
+    df = pd.DataFrame(pokemon_data_list)
+    return df
+
+def get_pokemon_data(pokemon_name):
+    """
+    Fetches data for a given Pokémon from the PokeAPI.
+    
+    Parameters:
+        pokemon_name (str): The name of the Pokémon to fetch.
+        
+    Returns:
+        dict: A dictionary containing the Pokémon's name, height, weight, abilities, and base stats.
+    """
+    url = f"https://pokeapi.co/api/v2/pokemon/{pokemon_name.lower()}/"
+    
+    response = requests.get(url)
+    
+    if response.status_code == 200:
+        data = response.json()
+        
+        # Extract relevant data
+        pokemon_info = {
+            'name': data['name'],
+            'height': data['height'],
+            'weight': data['weight'],
+            'abilities': ', '.join([ability['ability']['name'] for ability in data['abilities']]),
+            'base_stats': {stat['stat']['name']: stat['base_stat'] for stat in data['stats']}
+        }
+        
+        # Flatten base stats into separate columns
+        for stat, value in pokemon_info['base_stats'].items():
+            pokemon_info[stat] = value
+        
+        # Remove base_stats key now that we have flattened it
+        del pokemon_info['base_stats']
+        
+        return pokemon_info
+    else:
+        print(f"Error: Could not fetch data for {pokemon_name}. Status code {response.status_code}")
+        return None
+
+# Main execution
+def main():
+    sinnoh_pokemon_df = get_sinnoh_pokemon()
+    return sinnoh_pokemon_df
+
+
+</python>
+<python id="sinnoh_stg" table="SINNOH_STG" schema="POKEMON" database="RAW" handler="main" connection="connection_1" materialization="truncate" inputs="sinnoh_landing" schema_change="drop_and_recreate" >
+
+import pandas as pd
+import requests
+import datetime
+def main(t0):
+    t0['META_UPDATE_TIMESTAMP']= str(datetime.datetime.now())
+    return t0
+
+</python>
+
+<sql id="sinnoh_raw" table="SINNOH_RAW" schema="POKEMON" database="RAW" connection="connection_1" materialization="incremental" primary_key="name" inputs="sinnoh_stg" schema_change="drop_and_recreate">
+SELECT 
+* 
+FROM "POKEMON"."SINNOH_STG"
+
+</sql>
+
+<sql id="sinnoh_conf" table="SINNOH_CONF" schema="POKEMON" database="RAW" connection="connection_1" materialization="truncate"  inputs="sinnoh_raw" schema_change="drop_and_recreate">
+SELECT
+"name"::VARCHAR AS NAME,
+"height"::INTEGER AS HEIGHT,
+"weight"::INTEGER AS WEIGHT,
+"abilities"::VARCHAR AS ABILITIES,
+"hp"::INTEGER AS HP,
+"attack"::INTEGER AS ATTACK,
+"defense"::INTEGER AS DEFENSE,
+"special-attack"::INTEGER AS SPECIAL_ATTACK,
+"special-defense"::INTEGER AS SPECIAL_DEFENSE,
+"speed"::INTEGER AS SPEED,
+"META_UPDATE_TIMESTAMP" AS META_UPDATE_TIMESTAMP
+FROM "POKEMON"."SINNOH_RAW"
+
+</sql>
+
+<sql id="sinnoh_core" table="SINNOH_CORE" schema="POKEMON" database="RAW" connection="connection_1" materialization="incremental" primary_key="name"  inputs="sinnoh_conf" schema_change="drop_and_recreate">
+
+SELECT 
+* 
+FROM "POKEMON"."SINNOH_CONF"
+
+</sql>
+
+
