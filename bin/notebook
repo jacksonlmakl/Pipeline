@@ -50,19 +50,24 @@ if [ ! -d "$NOTEBOOK_DIR/$LOGS_DIR" ]; then
 fi
 
 # Link existing .log files from base directory to the logs directory
-for log_file in *.log; do
-  if [ -f "$log_file" ]; then
-    echo "Linking existing log file: $log_file"
-    ln -sf "$(pwd)/$log_file" "$NOTEBOOK_DIR/$LOGS_DIR/"
-  fi
-done
+link_log_files() {
+  for log_file in *.log; do
+    if [ -f "$log_file" ]; then
+      if [ ! -L "$NOTEBOOK_DIR/$LOGS_DIR/$(basename "$log_file")" ]; then
+        echo "Linking log file: $log_file"
+        ln -sf "$(pwd)/$log_file" "$NOTEBOOK_DIR/$LOGS_DIR/"
+      fi
+    fi
+  done
+}
 
-# Set up a background process to automatically link new .log files as they are created
-inotifywait -m -e create --format "%f" --exclude ".*" "$(pwd)" | while read new_file; do
-  if [[ "$new_file" == *.log ]]; then
-    echo "Linking new log file: $new_file"
-    ln -sf "$(pwd)/$new_file" "$NOTEBOOK_DIR/$LOGS_DIR/"
-  fi
+# Link existing log files initially
+link_log_files
+
+# Start a background process to check for new .log files every 10 seconds
+while true; do
+  link_log_files
+  sleep 10  # Check every 10 seconds
 done &
 
 # Create virtual environment if it doesn't exist
