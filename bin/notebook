@@ -10,6 +10,7 @@ VARIABLES_FILE="variables.json"
 NOTEBOOK_DIR="notebook"
 PIPELINES_DIR="pipelines"
 GRAPH_FILE="graph.png"
+LOGS_DIR="logs"
 JUPYTER_CONFIG_DIR="$HOME/.jupyter"
 
 # Create the notebook directory if it doesn't exist
@@ -41,6 +42,28 @@ if [ ! -L "$NOTEBOOK_DIR/$GRAPH_FILE" ]; then
   echo "Creating symbolic link for graph.png in '$NOTEBOOK_DIR'..."
   ln -s "$(pwd)/$GRAPH_FILE" "$NOTEBOOK_DIR/$GRAPH_FILE"
 fi
+
+# Create the logs directory inside notebook if it doesn't exist
+if [ ! -d "$NOTEBOOK_DIR/$LOGS_DIR" ]; then
+  echo "Creating logs directory in '$NOTEBOOK_DIR'..."
+  mkdir "$NOTEBOOK_DIR/$LOGS_DIR"
+fi
+
+# Link existing .log files from base directory to the logs directory
+for log_file in *.log; do
+  if [ -f "$log_file" ]; then
+    echo "Linking existing log file: $log_file"
+    ln -sf "$(pwd)/$log_file" "$NOTEBOOK_DIR/$LOGS_DIR/"
+  fi
+done
+
+# Set up a background process to automatically link new .log files as they are created
+inotifywait -m -e create --format "%f" --exclude ".*" "$(pwd)" | while read new_file; do
+  if [[ "$new_file" == *.log ]]; then
+    echo "Linking new log file: $new_file"
+    ln -sf "$(pwd)/$new_file" "$NOTEBOOK_DIR/$LOGS_DIR/"
+  fi
+done &
 
 # Create virtual environment if it doesn't exist
 if [ ! -d "$ENV_NAME" ]; then
