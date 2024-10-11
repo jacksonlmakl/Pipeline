@@ -171,14 +171,15 @@ def generate_pipeline_graph(data, output_filename):
     shell_layers = [[] for _ in range(max(layers.values()) + 1)]
     for node, depth in layers.items():
         shell_layers[depth].append(node)
+    
 
     # Use custom linear layout
     pos = linear_layout(shell_layers)
 
     # Draw the graph
     plt.figure(figsize=(1.4 * len(data), 1.2 * len(data)))
-    nx.draw(G, pos, arrowsize=20, with_labels=True, node_color=color_map, node_size=7000,
-            font_weight='bold', font_size=10, font_color='white', arrows=True, node_shape='o')
+    nx.draw(G, pos, arrowsize=22, with_labels=True, node_color=color_map, node_size=15000,
+            font_weight='bold', font_size=11, font_color='white', arrows=True, node_shape='o',verticalalignment='center_baseline')
     plt.title('Task Flow Graph (Left to Right Layout)')
 
     # Save the graph as a .png file

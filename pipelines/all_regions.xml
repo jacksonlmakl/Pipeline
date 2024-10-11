@@ -47,3 +47,7 @@ SELECT
 FROM "POKEMON"."JOHTO_CORE"
 
 </sql>
+
+<sql id="data_quality_test" connection="connection_1" inputs="all_regions">
+SELECT * FROM "POKEMON"."ALL_REGIONS"
+</sql>

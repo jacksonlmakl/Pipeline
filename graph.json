@@ -150,6 +150,16 @@
             "sinnoh_core",
             "kanto_core"
         ],
+        "outputs": [
+            "data_quality_test"
+        ],
+        "chains_to": null
+    },
+    "data_quality_test": {
+        "type": "sql",
+        "inputs": [
+            "all_regions"
+        ],
         "outputs": [],
         "chains_to": null
     }

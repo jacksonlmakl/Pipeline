@@ -63,6 +63,11 @@ class Table:
         self.connection.close()
         return df
     def build(self):
+        if self.materialization =="" or self.materialization==None:
+            if self.type=='sql':
+                self.connection.query(self.code)
+                print(self.code)
+                return self.code
         if self.materialization != "" and self.materialization != None and self.type!='python':
             df=self.get_dataframe()
         input_tables=[i for i in self.pipeline.tables if i.id in self.inputs]
