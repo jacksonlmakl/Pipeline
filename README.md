@@ -7,10 +7,12 @@ PyPipe is a lightweight and flexible data pipeline tool designed to combine the 
 - Python 3.10.
 - Unix-based operating system (e.g., Linux, macOS).
 - Root access.
+- Access On Port 5000
 ## Setup:
 - ``git clone https://github.com/jacksonlmakl/Pipeline.git``
 - ``cd Pipeline``.
 - ``bin/setup``.
+- ``bin/notebook`` (Optionally launch secure Jupyter notebook).
 
 
 ## Usage:
