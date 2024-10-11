@@ -3,3 +3,32 @@ env
 /*.py
 *.log
 variables.json
+# Ignore Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore Jupyter notebook logs and security files
+**/*.log
+*.log
+*.out
+*.err
+**/.local/share/jupyter/runtime/
+**/.local/share/jupyter/lab/workspaces/
+
+# Ignore Jupyter's kernel files and other runtime artifacts
+**/kernel-*.json
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore virtual environments (e.g., if using virtualenv or conda)
+env/
+venv/
+.venv/
+
+# Ignore hidden files created by Jupyter extensions or other local files
+*.ipynb~ 
+*.pyc
+*.pyo
+.DS_Store
