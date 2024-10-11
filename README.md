@@ -102,6 +102,15 @@ The XML file contains several key elements:
 ```xml
 <sql id="t7" table="JOHTO_RAW" schema="POKEMON" database="RAW" connection="connection_1" materialization="incremental" primary_key="name" inputs="t6" schema_change="drop_and_recreate">
 ```
+#### Note: You can write stand alone SQL code that does not auto-materialize a table by just using a sql component with only the connection tag and optionally inputs tag filled in.
+Example:
+```xml
+<sql connection="connection_1">
+```
+```xml
+<sql connection="connection_1" inputs="t0,t1">
+```
+
 - **id**: Unique object identifier.
 - **table**: Target table.
 - **schema**: Schema of the target table.
