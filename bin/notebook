@@ -122,4 +122,4 @@ c.NotebookApp.terminado_settings = {'shell_command': ['/bin/bash'], 'cwd': '$(pw
 " >> "$JUPYTER_CONFIG_FILE"
 
 # Launch Jupyter Notebook on port 5000, locked down to the notebook directory
-jupyter notebook --port=5000 --no-browser --ip=0.0.0.0 --notebook-dir="$NOTEBOOK_DIR" --NotebookApp.password="$HASHED_PASSWORD"
+nohup jupyter notebook --port=5000 --no-browser --ip=0.0.0.0 --notebook-dir="$NOTEBOOK_DIR" --NotebookApp.password="$HASHED_PASSWORD"
