@@ -25,4 +25,4 @@ else
 fi
 
 # Launch Jupyter Notebook on port 5000, locked down to the parent directory of bin/
-jupyter notebook --port=5000 --no-browser --ip=0.0.0.0 --notebook-dir="$(pwd)" --NotebookApp.token='' --NotebookApp.password=''
+jupyter notebook --port=5000 --no-browser --ip=0.0.0.0 --notebook-dir="$(pwd)" --NotebookApp.token='' --NotebookApp.password='' &
