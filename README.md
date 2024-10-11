@@ -45,6 +45,7 @@ The XML file contains several key elements:
 - **Materialization**: Controls how tables are managed (e.g., truncating, incremental updates).
 
 ## **Important Features**
+- **Jinja**: You can use Jupyter notebooks on port 5000 to develop and run pipelines. Launch it by using ``bin/notebook``. The username and password are in variables.json under ``notebook_username`` and ``notebok_password``.
 - **Jinja**: You may use Jinja when writing Pipeline files. Save variables to ``variables.json``.
 - **Chaining Pipelines**: You can kick off another Pipeline by creating a Python component at the end of a Pipeline file and incorporating this code into the handler function:
   

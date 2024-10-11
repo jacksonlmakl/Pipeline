@@ -1,4 +1,6 @@
 {
+    "notebook_username":"admin",
+    "notebook_password":"admin123",
     "connection_1_database": "RAW",
     "connection_1_username": "georgetown",
     "connection_1_password": "georgetown123",
