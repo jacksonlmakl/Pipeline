@@ -1,12 +1,9 @@
 <connection id="connection_1" host="{{ connection_1_host }}" port="{{ connection_1_port }}" username="{{ connection_1_username }}" database="{{ connection_1_database }}" password="{{ connection_1_password }}"></connection>
 
-<task id="build_pokemon" schedule="*/5 * * * *"></task>
+<task id="build_pokemon" schedule="*/2 * * * *"></task>
 
 <python id="johto_core" handler="main" inputs="johto_conf">
 
-import pandas as pd
-import requests
-import datetime
 from core import Pipeline
 def main():
     p=Pipeline('pipelines/johto.xml')
@@ -17,9 +14,6 @@ def main():
 </python>
 <python id="sinnoh_core"  handler="main" inputs="sinnoh_conf">
 
-import pandas as pd
-import requests
-import datetime
 from core import Pipeline
 def main():
     p=Pipeline('pipelines/sinnoh.xml')
@@ -30,9 +24,6 @@ def main():
 </python>
 <python id="kanto_core" handler="main" inputs="kanto_conf">
 
-import pandas as pd
-import requests
-import datetime
 from core import Pipeline
 def main():
     p=Pipeline('pipelines/kanto.xml')
