@@ -7,6 +7,40 @@ cd "$(dirname "$0")"/..
 ENV_NAME="env"
 REQUIREMENTS_FILE="requirements.txt"
 VARIABLES_FILE="variables.json"
+NOTEBOOK_DIR="notebook"
+PIPELINES_DIR="pipelines"
+GRAPH_FILE="graph.png"
+JUPYTER_CONFIG_DIR="$HOME/.jupyter"
+
+# Create the notebook directory if it doesn't exist
+if [ ! -d "$NOTEBOOK_DIR" ]; then
+  echo "Creating directory '$NOTEBOOK_DIR'..."
+  mkdir "$NOTEBOOK_DIR"
+fi
+
+# Create the pipelines directory inside notebook if it doesn't exist and link to the base folder
+if [ ! -L "$NOTEBOOK_DIR/$PIPELINES_DIR" ]; then
+  echo "Creating symbolic link for pipelines in '$NOTEBOOK_DIR'..."
+  ln -s "$(pwd)/$PIPELINES_DIR" "$NOTEBOOK_DIR/$PIPELINES_DIR"
+fi
+
+# Create symbolic link for variables.json if it doesn't exist
+if [ ! -L "$NOTEBOOK_DIR/$VARIABLES_FILE" ]; then
+  echo "Creating symbolic link for variables.json in '$NOTEBOOK_DIR'..."
+  ln -s "$(pwd)/$VARIABLES_FILE" "$NOTEBOOK_DIR/$VARIABLES_FILE"
+fi
+
+# Create symbolic link for requirements.txt if it doesn't exist
+if [ ! -L "$NOTEBOOK_DIR/$REQUIREMENTS_FILE" ]; then
+  echo "Creating symbolic link for requirements.txt in '$NOTEBOOK_DIR'..."
+  ln -s "$(pwd)/$REQUIREMENTS_FILE" "$NOTEBOOK_DIR/$REQUIREMENTS_FILE"
+fi
+
+# Create symbolic link for graph.png if it doesn't exist
+if [ ! -L "$NOTEBOOK_DIR/$GRAPH_FILE" ]; then
+  echo "Creating symbolic link for graph.png in '$NOTEBOOK_DIR'..."
+  ln -s "$(pwd)/$GRAPH_FILE" "$NOTEBOOK_DIR/$GRAPH_FILE"
+fi
 
 # Create virtual environment if it doesn't exist
 if [ ! -d "$ENV_NAME" ]; then
@@ -25,9 +59,9 @@ else
   echo "No requirements.txt found, skipping installation of dependencies."
 fi
 
-# Check if variables.json exists
+# Check if variables.json exists in the base directory
 if [ ! -f "$VARIABLES_FILE" ]; then
-  echo "Error: $VARIABLES_FILE not found!"
+  echo "Error: $VARIABLES_FILE not found in the base directory!"
   exit 1
 fi
 
@@ -42,5 +76,22 @@ fi
 # Hash the password using Jupyter's password hashing function
 HASHED_PASSWORD=$(python3 -c "from jupyter_server.auth.security import passwd; print(passwd('$NOTEBOOK_PASSWORD'))")
 
-# Launch Jupyter Notebook on port 5000, locked down to the parent directory of bin/
-jupyter notebook --port=5000 --no-browser --ip=0.0.0.0 --notebook-dir="$(pwd)" --NotebookApp.password="$HASHED_PASSWORD"
+# Create the Jupyter configuration directory if it doesn't exist
+if [ ! -d "$JUPYTER_CONFIG_DIR" ]; then
+  mkdir -p "$JUPYTER_CONFIG_DIR"
+fi
+
+# Update the Jupyter config to set the terminal start directory to notebook
+JUPYTER_CONFIG_FILE="$JUPYTER_CONFIG_DIR/jupyter_notebook_config.py"
+if [ ! -f "$JUPYTER_CONFIG_FILE" ]; then
+  jupyter notebook --generate-config
+fi
+
+# Set the terminal to start in the notebook directory
+echo "
+# Set the terminal to start in the notebook directory
+c.NotebookApp.terminado_settings = {'shell_command': ['/bin/bash'], 'cwd': '$(pwd)/$NOTEBOOK_DIR'}
+" >> "$JUPYTER_CONFIG_FILE"
+
+# Launch Jupyter Notebook on port 5000, locked down to the notebook directory
+jupyter notebook --port=5000 --no-browser --ip=0.0.0.0 --notebook-dir="$NOTEBOOK_DIR" --NotebookApp.password="$HASHED_PASSWORD"
