@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Navigate to the parent directory of the bin folder
+cd "$(dirname "$0")"/..
+
+# Set the environment name and the requirements file
+ENV_NAME="env"
+REQUIREMENTS_FILE="requirements.txt"
+
+# Create the environment if it doesn't exist
+if ! conda info --envs | grep -q "^$ENV_NAME"; then
+  echo "Creating environment '$ENV_NAME'..."
+  conda create --name "$ENV_NAME" python=3.9 -y
+fi
+
+# Activate the environment
+source activate "$ENV_NAME"
+
+# Install dependencies if not already installed
+if [ -f "$REQUIREMENTS_FILE" ]; then
+  echo "Installing dependencies from $REQUIREMENTS_FILE..."
+  pip install -r "$REQUIREMENTS_FILE"
+else
+  echo "No requirements.txt found, skipping installation of dependencies."
+fi
+
+# Launch Jupyter Notebook on port 5000, locked down to the parent directory of bin/
+jupyter notebook --port=5000 --no-browser --ip=0.0.0.0 --notebook-dir="$(pwd)" --NotebookApp.token='' --NotebookApp.password=''
