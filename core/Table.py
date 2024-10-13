@@ -23,7 +23,8 @@ def run_python_code(code_str, file_name):
     activate_script = os.path.join(env_dir, "bin", "activate")
     python_exec = os.path.join(env_dir, "bin", "python")
 
-    command = f"source {activate_script} && {python_exec} {file_name}"
+    # Using bash -c to ensure that Ubuntu's shell handles 'source' correctly
+    command = f"bash -c 'source {activate_script} && {python_exec} {file_name}'"
 
     # Step 4: Capture the output of running the Python file
     result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
@@ -95,12 +96,3 @@ class Table:
             query=self.code
             print(query)
             self.connection.query_to_table(query, self.table, self.database, self.schema, self.materialization, schema_change_behavior=self.schema_change, primary_key=self.primary_key)
-            
-            
-            
-        
-    
-    
-    
-                
-                
