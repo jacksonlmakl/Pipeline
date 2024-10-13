@@ -4,8 +4,9 @@ PyPipe is a lightweight and flexible data pipeline tool designed to combine the 
 
 
 ## Requirements:
-- Python 3.10.
+- Python 3.10.(python3, python3-venv)
 - Unix-based operating system (e.g., Linux, macOS).
+- JQ
 - Root access.
 - Access On Port 5000
 ## Setup:
