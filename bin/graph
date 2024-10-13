@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/bin/bash  # Ensure it runs using bash
+
 # Check if the virtual environment "env" exists
 if [ ! -d "env" ]; then
     echo "Creating virtual environment 'env'..."
@@ -20,7 +21,15 @@ else
     # Activate the virtual environment
     source env/bin/activate
 fi
+
+# Move into the bin directory
 cd bin
+
+# Run the Python script
 python graph.py
+
+# Return to the original directory
 cd -
+
+# Uncomment to display the contents of graph.json if needed
 # cat graph.json
