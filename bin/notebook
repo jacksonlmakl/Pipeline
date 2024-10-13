@@ -13,6 +13,15 @@ GRAPH_FILE="graph.png"
 LOGS_DIR="logs"
 JUPYTER_CONFIG_DIR="$HOME/.jupyter"
 
+# Ensure readlink -f is available (fallback for realpath)
+resolve_path() {
+  if command -v realpath > /dev/null 2>&1; then
+    realpath "$1"
+  else
+    readlink -f "$1"
+  fi
+}
+
 # Create the notebook directory if it doesn't exist
 if [ ! -d "$NOTEBOOK_DIR" ]; then
   echo "Creating directory '$NOTEBOOK_DIR'..."
@@ -22,25 +31,25 @@ fi
 # Create the pipelines directory inside notebook if it doesn't exist and link to the base folder
 if [ ! -L "$NOTEBOOK_DIR/$PIPELINES_DIR" ]; then
   echo "Creating symbolic link for pipelines in '$NOTEBOOK_DIR'..."
-  ln -s "$(pwd)/$PIPELINES_DIR" "$NOTEBOOK_DIR/$PIPELINES_DIR"
+  ln -s "$(resolve_path "$PIPELINES_DIR")" "$NOTEBOOK_DIR/$PIPELINES_DIR"
 fi
 
 # Create symbolic link for variables.json if it doesn't exist
 if [ ! -L "$NOTEBOOK_DIR/$VARIABLES_FILE" ]; then
   echo "Creating symbolic link for variables.json in '$NOTEBOOK_DIR'..."
-  ln -s "$(pwd)/$VARIABLES_FILE" "$NOTEBOOK_DIR/$VARIABLES_FILE"
+  ln -s "$(resolve_path "$VARIABLES_FILE")" "$NOTEBOOK_DIR/$VARIABLES_FILE"
 fi
 
 # Create symbolic link for requirements.txt if it doesn't exist
 if [ ! -L "$NOTEBOOK_DIR/$REQUIREMENTS_FILE" ]; then
   echo "Creating symbolic link for requirements.txt in '$NOTEBOOK_DIR'..."
-  ln -s "$(pwd)/$REQUIREMENTS_FILE" "$NOTEBOOK_DIR/$REQUIREMENTS_FILE"
+  ln -s "$(resolve_path "$REQUIREMENTS_FILE")" "$NOTEBOOK_DIR/$REQUIREMENTS_FILE"
 fi
 
 # Create symbolic link for graph.png if it doesn't exist
 if [ ! -L "$NOTEBOOK_DIR/$GRAPH_FILE" ]; then
   echo "Creating symbolic link for graph.png in '$NOTEBOOK_DIR'..."
-  ln -s "$(pwd)/$GRAPH_FILE" "$NOTEBOOK_DIR/$GRAPH_FILE"
+  ln -s "$(resolve_path "$GRAPH_FILE")" "$NOTEBOOK_DIR/$GRAPH_FILE"
 fi
 
 # Create the logs directory inside notebook if it doesn't exist
@@ -55,7 +64,7 @@ link_log_files() {
     if [ -f "$log_file" ]; then
       if [ ! -L "$NOTEBOOK_DIR/$LOGS_DIR/$(basename "$log_file")" ]; then
         echo "Linking log file: $log_file"
-        ln -sf "$(pwd)/$log_file" "$NOTEBOOK_DIR/$LOGS_DIR/"
+        ln -sf "$(resolve_path "$log_file")" "$NOTEBOOK_DIR/$LOGS_DIR/"
       fi
     fi
   done
@@ -118,8 +127,8 @@ fi
 # Set the terminal to start in the notebook directory
 echo "
 # Set the terminal to start in the notebook directory
-c.NotebookApp.terminado_settings = {'shell_command': ['/bin/bash'], 'cwd': '$(pwd)/$NOTEBOOK_DIR'}
+c.NotebookApp.terminado_settings = {'shell_command': ['/bin/bash'], 'cwd': '$(resolve_path "$NOTEBOOK_DIR")'}
 " >> "$JUPYTER_CONFIG_FILE"
 
 # Launch Jupyter Notebook on port 5000, locked down to the notebook directory
-nohup jupyter notebook --port=5000 --no-browser --ip=0.0.0.0 --notebook-dir="$NOTEBOOK_DIR" --NotebookApp.password="$HASHED_PASSWORD"
+nohup jupyter notebook --port=5000 --no-browser --ip=0.0.0.0 --notebook-dir="$NOTEBOOK_DIR" --NotebookApp.password="$HASHED_PASSWORD" > "$NOTEBOOK_DIR/$LOGS_DIR/jupyter.log" 2>&1 &
