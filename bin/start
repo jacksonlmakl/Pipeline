@@ -5,8 +5,8 @@ if [ ! -d "env" ]; then
     echo "Creating virtual environment 'env'..."
     python3 -m venv env
     
-    # Activate the virtual environment
-    source env/bin/activate
+    # Activate the virtual environment using bash
+    bash -c "source env/bin/activate"
 
     # Install dependencies from requirements.txt if it exists
     if [ -f "requirements.txt" ]; then
@@ -18,8 +18,8 @@ if [ ! -d "env" ]; then
 else
     echo "Virtual environment 'env' already exists."
     
-    # Activate the virtual environment
-    source env/bin/activate
+    # Activate the virtual environment using bash
+    bash -c "source env/bin/activate"
 fi
 
 # Check if a filename argument was passed
@@ -47,4 +47,3 @@ echo "$python_code" > $file_name'.py'
 
 # Run the Python script
 python $file_name'.py' &
-
